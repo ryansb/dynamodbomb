@@ -1,8 +1,8 @@
 package ddbomb
 
-import simplejson "github.com/bitly/go-simplejson"
 import (
 	"errors"
+	simplejson "github.com/bitly/go-simplejson"
 	"github.com/crowdmob/goamz/aws"
 	"io/ioutil"
 	"log"

@@ -4,30 +4,6 @@ import (
 	"strconv"
 )
 
-const (
-	TYPE_STRING = "S"
-	TYPE_NUMBER = "N"
-	TYPE_BINARY = "B"
-
-	TYPE_STRING_SET = "SS"
-	TYPE_NUMBER_SET = "NS"
-	TYPE_BINARY_SET = "BS"
-
-	COMPARISON_EQUAL                    = "EQ"
-	COMPARISON_NOT_EQUAL                = "NE"
-	COMPARISON_LESS_THAN_OR_EQUAL       = "LE"
-	COMPARISON_LESS_THAN                = "LT"
-	COMPARISON_GREATER_THAN_OR_EQUAL    = "GE"
-	COMPARISON_GREATER_THAN             = "GT"
-	COMPARISON_ATTRIBUTE_EXISTS         = "NOT_NULL"
-	COMPARISON_ATTRIBUTE_DOES_NOT_EXIST = "NULL"
-	COMPARISON_CONTAINS                 = "CONTAINS"
-	COMPARISON_DOES_NOT_CONTAIN         = "NOT_CONTAINS"
-	COMPARISON_BEGINS_WITH              = "BEGINS_WITH"
-	COMPARISON_IN                       = "IN"
-	COMPARISON_BETWEEN                  = "BETWEEN"
-)
-
 type Key struct {
 	HashKey  string
 	RangeKey string
@@ -39,7 +15,7 @@ type PrimaryKey struct {
 }
 
 type Attribute struct {
-	Type      string
+	Type      DataType
 	Name      string
 	Value     string
 	SetValues []string
@@ -48,14 +24,14 @@ type Attribute struct {
 
 type AttributeComparison struct {
 	AttributeName      string
-	ComparisonOperator string
+	ComparisonOperator ComparisonType
 	AttributeValueList []Attribute // contains attributes with only types and names (value ignored)
 }
 
 func NewEqualInt64AttributeComparison(attributeName string, equalToValue int64) *AttributeComparison {
 	numeric := NewNumericAttribute(attributeName, strconv.FormatInt(equalToValue, 10))
 	return &AttributeComparison{attributeName,
-		COMPARISON_EQUAL,
+		CMP_EQUAL,
 		[]Attribute{*numeric},
 	}
 }
@@ -63,12 +39,12 @@ func NewEqualInt64AttributeComparison(attributeName string, equalToValue int64) 
 func NewEqualStringAttributeComparison(attributeName string, equalToValue string) *AttributeComparison {
 	str := NewStringAttribute(attributeName, equalToValue)
 	return &AttributeComparison{attributeName,
-		COMPARISON_EQUAL,
+		CMP_EQUAL,
 		[]Attribute{*str},
 	}
 }
 
-func NewStringAttributeComparison(attributeName string, comparisonOperator string, value string) *AttributeComparison {
+func NewStringAttributeComparison(attributeName string, comparisonOperator ComparisonType, value string) *AttributeComparison {
 	valueToCompare := NewStringAttribute(attributeName, value)
 	return &AttributeComparison{attributeName,
 		comparisonOperator,
@@ -76,7 +52,7 @@ func NewStringAttributeComparison(attributeName string, comparisonOperator strin
 	}
 }
 
-func NewNumericAttributeComparison(attributeName string, comparisonOperator string, value int64) *AttributeComparison {
+func NewNumericAttributeComparison(attributeName string, comparisonOperator ComparisonType, value int64) *AttributeComparison {
 	valueToCompare := NewNumericAttribute(attributeName, strconv.FormatInt(value, 10))
 	return &AttributeComparison{attributeName,
 		comparisonOperator,
@@ -84,7 +60,7 @@ func NewNumericAttributeComparison(attributeName string, comparisonOperator stri
 	}
 }
 
-func NewBinaryAttributeComparison(attributeName string, comparisonOperator string, value bool) *AttributeComparison {
+func NewBinaryAttributeComparison(attributeName string, comparisonOperator ComparisonType, value bool) *AttributeComparison {
 	valueToCompare := NewBinaryAttribute(attributeName, strconv.FormatBool(value))
 	return &AttributeComparison{attributeName,
 		comparisonOperator,
@@ -94,7 +70,7 @@ func NewBinaryAttributeComparison(attributeName string, comparisonOperator strin
 
 func NewStringAttribute(name string, value string) *Attribute {
 	return &Attribute{
-		Type:  TYPE_STRING,
+		Type:  STRING,
 		Name:  name,
 		Value: value,
 	}
@@ -102,7 +78,7 @@ func NewStringAttribute(name string, value string) *Attribute {
 
 func NewNumericAttribute(name string, value string) *Attribute {
 	return &Attribute{
-		Type:  TYPE_NUMBER,
+		Type:  NUMBER,
 		Name:  name,
 		Value: value,
 	}
@@ -110,7 +86,7 @@ func NewNumericAttribute(name string, value string) *Attribute {
 
 func NewBinaryAttribute(name string, value string) *Attribute {
 	return &Attribute{
-		Type:  TYPE_BINARY,
+		Type:  BINARY,
 		Name:  name,
 		Value: value,
 	}
@@ -118,7 +94,7 @@ func NewBinaryAttribute(name string, value string) *Attribute {
 
 func NewStringSetAttribute(name string, values []string) *Attribute {
 	return &Attribute{
-		Type:      TYPE_STRING_SET,
+		Type:      STRING_SET,
 		Name:      name,
 		SetValues: values,
 	}
@@ -126,7 +102,7 @@ func NewStringSetAttribute(name string, values []string) *Attribute {
 
 func NewNumericSetAttribute(name string, values []string) *Attribute {
 	return &Attribute{
-		Type:      TYPE_NUMBER_SET,
+		Type:      NUMBER_SET,
 		Name:      name,
 		SetValues: values,
 	}
@@ -134,7 +110,7 @@ func NewNumericSetAttribute(name string, values []string) *Attribute {
 
 func NewBinarySetAttribute(name string, values []string) *Attribute {
 	return &Attribute{
-		Type:      TYPE_BINARY_SET,
+		Type:      BINARY_SET,
 		Name:      name,
 		SetValues: values,
 	}
@@ -142,7 +118,7 @@ func NewBinarySetAttribute(name string, values []string) *Attribute {
 
 func (a *Attribute) SetType() bool {
 	switch a.Type {
-	case TYPE_BINARY_SET, TYPE_NUMBER_SET, TYPE_STRING_SET:
+	case BINARY_SET, NUMBER_SET, STRING_SET:
 		return true
 	}
 	return false

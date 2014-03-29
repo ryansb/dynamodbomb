@@ -7,11 +7,6 @@ import (
 	simplejson "github.com/bitly/go-simplejson"
 )
 
-const (
-	TYPE_RANGE_KEY = "RANGE"
-	TYPE_HASH_KEY  = "HASH"
-)
-
 type Table struct {
 	Server *Server
 	Name   string
@@ -25,7 +20,7 @@ type AttributeDefinitionT struct {
 
 type KeySchemaT struct {
 	AttributeName string
-	KeyType       string
+	KeyType       KeyType
 }
 
 type ProjectionT struct {
@@ -107,9 +102,9 @@ func (t *TableDescriptionT) BuildPrimaryKey() (pk PrimaryKey, err error) {
 		}
 
 		switch k.KeyType {
-		case TYPE_HASH_KEY:
+		case HASH_KEY:
 			pk.KeyAttribute = attr
-		case TYPE_RANGE_KEY:
+		case RANGE_KEY:
 			pk.RangeAttribute = attr
 		}
 	}
@@ -224,6 +219,6 @@ func keyParam(k *PrimaryKey, hashKey string, rangeKey string) string {
 	return fmt.Sprintf("\"Key\":%s}", value)
 }
 
-func keyValue(key string, value string) string {
-	return fmt.Sprintf("\"%s\":\"%s\"", key, value)
+func keyValue(key DataType, value string) string {
+	return fmt.Sprintf("\"%v\":\"%s\"", key, value)
 }

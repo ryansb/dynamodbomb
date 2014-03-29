@@ -1,9 +1,9 @@
 package ddbomb
 
-import simplejson "github.com/bitly/go-simplejson"
 import (
 	"errors"
 	"fmt"
+	simplejson "github.com/bitly/go-simplejson"
 	"log"
 )
 
@@ -285,26 +285,26 @@ func parseAttributes(s map[string]interface{}) map[string]*Attribute {
 	results := map[string]*Attribute{}
 
 	for key, value := range s {
-		if v, ok := value.(map[string]interface{}); ok {
-			if val, ok := v[TYPE_STRING].(string); ok {
+		if v, ok := value.(map[DataType]interface{}); ok {
+			if val, ok := v[STRING].(string); ok {
 				results[key] = &Attribute{
-					Type:  TYPE_STRING,
+					Type:  STRING,
 					Name:  key,
 					Value: val,
 				}
-			} else if val, ok := v[TYPE_NUMBER].(string); ok {
+			} else if val, ok := v[NUMBER].(string); ok {
 				results[key] = &Attribute{
-					Type:  TYPE_NUMBER,
+					Type:  NUMBER,
 					Name:  key,
 					Value: val,
 				}
-			} else if val, ok := v[TYPE_BINARY].(string); ok {
+			} else if val, ok := v[BINARY].(string); ok {
 				results[key] = &Attribute{
-					Type:  TYPE_BINARY,
+					Type:  BINARY,
 					Name:  key,
 					Value: val,
 				}
-			} else if vals, ok := v[TYPE_STRING_SET].([]interface{}); ok {
+			} else if vals, ok := v[STRING_SET].([]interface{}); ok {
 				arry := make([]string, len(vals))
 				for i, ivalue := range vals {
 					if val, ok := ivalue.(string); ok {
@@ -312,11 +312,11 @@ func parseAttributes(s map[string]interface{}) map[string]*Attribute {
 					}
 				}
 				results[key] = &Attribute{
-					Type:      TYPE_STRING_SET,
+					Type:      STRING_SET,
 					Name:      key,
 					SetValues: arry,
 				}
-			} else if vals, ok := v[TYPE_NUMBER_SET].([]interface{}); ok {
+			} else if vals, ok := v[NUMBER_SET].([]interface{}); ok {
 				arry := make([]string, len(vals))
 				for i, ivalue := range vals {
 					if val, ok := ivalue.(string); ok {
@@ -324,11 +324,11 @@ func parseAttributes(s map[string]interface{}) map[string]*Attribute {
 					}
 				}
 				results[key] = &Attribute{
-					Type:      TYPE_NUMBER_SET,
+					Type:      NUMBER_SET,
 					Name:      key,
 					SetValues: arry,
 				}
-			} else if vals, ok := v[TYPE_BINARY_SET].([]interface{}); ok {
+			} else if vals, ok := v[BINARY_SET].([]interface{}); ok {
 				arry := make([]string, len(vals))
 				for i, ivalue := range vals {
 					if val, ok := ivalue.(string); ok {
@@ -336,7 +336,7 @@ func parseAttributes(s map[string]interface{}) map[string]*Attribute {
 					}
 				}
 				results[key] = &Attribute{
-					Type:      TYPE_BINARY_SET,
+					Type:      BINARY_SET,
 					Name:      key,
 					SetValues: arry,
 				}

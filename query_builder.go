@@ -25,10 +25,10 @@ func (q *Query) AddKey(t *Table, key *Key) {
 	k := t.Key
 	keymap := msi{
 		k.KeyAttribute.Name: msi{
-			k.KeyAttribute.Type: key.HashKey},
+			string(k.KeyAttribute.Type): key.HashKey},
 	}
 	if k.HasRange() {
-		keymap[k.RangeAttribute.Name] = msi{k.RangeAttribute.Type: key.RangeKey}
+		keymap[k.RangeAttribute.Name] = msi{string(k.RangeAttribute.Type): key.RangeKey}
 	}
 
 	q.buffer["Key"] = keymap
@@ -38,9 +38,9 @@ func keyAttributes(t *Table, key *Key) msi {
 	k := t.Key
 
 	out := msi{}
-	out[k.KeyAttribute.Name] = msi{k.KeyAttribute.Type: key.HashKey}
+	out[k.KeyAttribute.Name] = msi{string(k.KeyAttribute.Type): key.HashKey}
 	if k.HasRange() {
-		out[k.RangeAttribute.Name] = msi{k.RangeAttribute.Type: key.RangeKey}
+		out[k.RangeAttribute.Name] = msi{string(k.RangeAttribute.Type): key.RangeKey}
 	}
 	return out
 }
@@ -165,7 +165,7 @@ func buildComparisons(comparisons []AttributeComparison) msi {
 	for _, c := range comparisons {
 		avlist := []interface{}{}
 		for _, attributeValue := range c.AttributeValueList {
-			avlist = append(avlist, msi{attributeValue.Type: attributeValue.Value})
+			avlist = append(avlist, msi{string(attributeValue.Type): attributeValue.Value})
 		}
 		out[c.AttributeName] = msi{
 			"AttributeValueList": avlist,
@@ -186,7 +186,7 @@ func (q *Query) AddUpdates(attributes []Attribute, action string) {
 	for _, a := range attributes {
 		au := msi{
 			"Value": msi{
-				a.Type: map[bool]interface{}{true: a.SetValues, false: a.Value}[a.SetType()],
+				string(a.Type): map[bool]interface{}{true: a.SetValues, false: a.Value}[a.SetType()],
 			},
 			"Action": action,
 		}
@@ -209,7 +209,7 @@ func (q *Query) AddExpected(attributes []Attribute) {
 		}
 		// If set Exists to false, we must remove Value
 		if value["Exists"] != "false" {
-			value["Value"] = msi{a.Type: map[bool]interface{}{true: a.SetValues, false: a.Value}[a.SetType()]}
+			value["Value"] = msi{string(a.Type): map[bool]interface{}{true: a.SetValues, false: a.Value}[a.SetType()]}
 		}
 		expected[a.Name] = value
 	}
@@ -220,7 +220,7 @@ func attributeList(attributes []Attribute) msi {
 	b := msi{}
 	for _, a := range attributes {
 		//UGH!!  (I miss the query operator)
-		b[a.Name] = msi{a.Type: map[bool]interface{}{true: a.SetValues, false: a.Value}[a.SetType()]}
+		b[a.Name] = msi{string(a.Type): map[bool]interface{}{true: a.SetValues, false: a.Value}[a.SetType()]}
 	}
 	return b
 }
