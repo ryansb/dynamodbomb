@@ -29,43 +29,23 @@ type AttributeComparison struct {
 }
 
 func NewEqualInt64AttributeComparison(attributeName string, equalToValue int64) *AttributeComparison {
-	numeric := NewNumericAttribute(attributeName, strconv.FormatInt(equalToValue, 10))
-	return &AttributeComparison{attributeName,
-		CMP_EQUAL,
-		[]Attribute{*numeric},
-	}
+	return newComparison(attributeName, NUMBER, CMP_EQUAL, strconv.FormatInt(equalToValue, 10))
 }
 
 func NewEqualStringAttributeComparison(attributeName string, equalToValue string) *AttributeComparison {
-	str := NewStringAttribute(attributeName, equalToValue)
-	return &AttributeComparison{attributeName,
-		CMP_EQUAL,
-		[]Attribute{*str},
-	}
+	return newComparison(attributeName, STRING, CMP_EQUAL, equalToValue)
 }
 
 func NewStringAttributeComparison(attributeName string, comparisonOperator ComparisonType, value string) *AttributeComparison {
-	valueToCompare := NewStringAttribute(attributeName, value)
-	return &AttributeComparison{attributeName,
-		comparisonOperator,
-		[]Attribute{*valueToCompare},
-	}
+	return newComparison(attributeName, STRING, comparisonOperator, value)
 }
 
 func NewNumericAttributeComparison(attributeName string, comparisonOperator ComparisonType, value int64) *AttributeComparison {
-	valueToCompare := NewNumericAttribute(attributeName, strconv.FormatInt(value, 10))
-	return &AttributeComparison{attributeName,
-		comparisonOperator,
-		[]Attribute{*valueToCompare},
-	}
+	return newComparison(attributeName, NUMBER, comparisonOperator, strconv.FormatInt(value, 10))
 }
 
 func NewBinaryAttributeComparison(attributeName string, comparisonOperator ComparisonType, value bool) *AttributeComparison {
-	valueToCompare := NewBinaryAttribute(attributeName, strconv.FormatBool(value))
-	return &AttributeComparison{attributeName,
-		comparisonOperator,
-		[]Attribute{*valueToCompare},
-	}
+	return newComparison(attributeName, BINARY, comparisonOperator, strconv.FormatBool(value))
 }
 
 func NewStringAttribute(name string, value string) *Attribute {
@@ -158,4 +138,25 @@ func (k *PrimaryKey) Clone(h string, r string) []Attribute {
 	}
 
 	return result
+}
+
+func newComparison(attributeName string, dataType DataType, comparisonOperator ComparisonType, value ...string) *AttributeComparison {
+	attrs := make([]Attribute, 1)
+	if dataType == NUMBER || dataType == STRING || dataType == BINARY {
+		attrs[0] = Attribute{
+			Type:  dataType,
+			Name:  attributeName,
+			Value: value[0],
+		}
+	} else {
+		attrs[0] = Attribute{
+			Type:      dataType,
+			Name:      attributeName,
+			SetValues: value,
+		}
+	}
+	return &AttributeComparison{attributeName,
+		comparisonOperator,
+		attrs,
+	}
 }
