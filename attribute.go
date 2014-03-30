@@ -162,17 +162,27 @@ func newComparison(attributeName string, dataType DataType, comparisonOperator C
 	}
 }
 
+/* Takes any struct and prepares it to save to dynamodb. To make sure a field
+ * never gets saved in dynamodb, use the struct tag "ddbignore"
+ * type MyThing struct {
+ *     unHashedPassword string `ddbignore:"please"` // will never be stored in dynamo
+ *     HashedPassword   string `ddbname:"hashpw"`   // change the name of the attribute in dynamodb
+ *     Thumbnail        []byte `ddbtype:"BINARY"`   // make sure it's saved as binary
+ * }
+ */
 func fromArbitrary(in interface{}) (attrs []Attribute) {
 	st := reflect.TypeOf(in)
 	for i := 0; i < st.NumField(); i++ {
 		field := st.Field(i)
+		if field.Tag.Get("ddbignore") != "" {
+			continue
+		}
 		fName := field.Tag.Get("ddbname")
 		fType := field.Tag.Get("ddbtype")
 		if fName == "" {
-			// no name tag, use field name
+			fName = field.Name // no name tag, use field name
 		}
 		if fType == "" {
-			fType = field.Name
 			// no type tag, guess using primitive
 		}
 		switch field.Type.Kind() {
