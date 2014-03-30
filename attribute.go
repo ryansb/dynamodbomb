@@ -1,6 +1,7 @@
 package ddbomb
 
 import (
+	"reflect"
 	"strconv"
 )
 
@@ -159,4 +160,39 @@ func newComparison(attributeName string, dataType DataType, comparisonOperator C
 		comparisonOperator,
 		attrs,
 	}
+}
+
+func fromArbitrary(in interface{}) (attrs []Attribute) {
+	st := reflect.TypeOf(in)
+	for i := 0; i < st.NumField(); i++ {
+		field := st.Field(i)
+		fName := field.Tag.Get("ddbname")
+		fType := field.Tag.Get("ddbtype")
+		if fName == "" {
+			// no name tag, use field name
+		}
+		if fType == "" {
+			// no type tag, guess using primitive
+		}
+		switch field.Type.Kind() {
+		case reflect.Bool:
+			_ = BINARY
+		case reflect.String:
+			_ = STRING
+		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Float32, reflect.Float64:
+			_ = NUMBER
+		case reflect.Slice:
+			switch reflect.SliceOf(field.Type).Kind() { // switch on this as well
+			case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Float32, reflect.Float64:
+				_ = NUMBER_SET
+			case reflect.String:
+				_ = STRING_SET
+			default:
+				// skip field
+			}
+		default:
+			// skip field
+		}
+	}
+	return
 }
