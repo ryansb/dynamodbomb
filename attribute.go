@@ -172,13 +172,18 @@ func fromArbitrary(in interface{}) (attrs []Attribute) {
 			// no name tag, use field name
 		}
 		if fType == "" {
+			fType = field.Name
 			// no type tag, guess using primitive
 		}
 		switch field.Type.Kind() {
 		case reflect.Bool:
 			_ = BINARY
 		case reflect.String:
-			_ = STRING
+			attrs = append(attrs, Attribute{
+				Name:  fName,
+				Type:  STRING,
+				Value: reflect.ValueOf(field).String(),
+			})
 		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Float32, reflect.Float64:
 			_ = NUMBER
 		case reflect.Slice:
