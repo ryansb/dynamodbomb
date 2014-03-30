@@ -159,7 +159,6 @@ func (t *Table) getItem(key *Key, consistentRead bool) (map[string]*Attribute, e
 	}
 
 	return parseAttributes(item), nil
-
 }
 
 func (t *Table) PutItem(hashKey string, rangeKey string, attributes []Attribute) (bool, error) {
@@ -285,26 +284,26 @@ func parseAttributes(s map[string]interface{}) map[string]*Attribute {
 	results := map[string]*Attribute{}
 
 	for key, value := range s {
-		if v, ok := value.(map[DataType]interface{}); ok {
-			if val, ok := v[STRING].(string); ok {
+		if v, ok := value.(map[string]interface{}); ok {
+			if val, ok := v[string(STRING)].(string); ok {
 				results[key] = &Attribute{
 					Type:  STRING,
 					Name:  key,
 					Value: val,
 				}
-			} else if val, ok := v[NUMBER].(string); ok {
+			} else if val, ok := v[string(NUMBER)].(string); ok {
 				results[key] = &Attribute{
 					Type:  NUMBER,
 					Name:  key,
 					Value: val,
 				}
-			} else if val, ok := v[BINARY].(string); ok {
+			} else if val, ok := v[string(BINARY)].(string); ok {
 				results[key] = &Attribute{
 					Type:  BINARY,
 					Name:  key,
 					Value: val,
 				}
-			} else if vals, ok := v[STRING_SET].([]interface{}); ok {
+			} else if vals, ok := v[string(STRING_SET)].([]interface{}); ok {
 				arry := make([]string, len(vals))
 				for i, ivalue := range vals {
 					if val, ok := ivalue.(string); ok {
@@ -316,7 +315,7 @@ func parseAttributes(s map[string]interface{}) map[string]*Attribute {
 					Name:      key,
 					SetValues: arry,
 				}
-			} else if vals, ok := v[NUMBER_SET].([]interface{}); ok {
+			} else if vals, ok := v[string(NUMBER_SET)].([]interface{}); ok {
 				arry := make([]string, len(vals))
 				for i, ivalue := range vals {
 					if val, ok := ivalue.(string); ok {
@@ -328,7 +327,7 @@ func parseAttributes(s map[string]interface{}) map[string]*Attribute {
 					Name:      key,
 					SetValues: arry,
 				}
-			} else if vals, ok := v[BINARY_SET].([]interface{}); ok {
+			} else if vals, ok := v[string(BINARY_SET)].([]interface{}); ok {
 				arry := make([]string, len(vals))
 				for i, ivalue := range vals {
 					if val, ok := ivalue.(string); ok {
