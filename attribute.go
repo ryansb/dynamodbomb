@@ -194,8 +194,30 @@ func fromArbitrary(in interface{}) (attrs []Attribute) {
 				Type:  STRING,
 				Value: reflect.ValueOf(field).String(),
 			})
-		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Float32, reflect.Float64:
-			_ = NUMBER
+		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+			attrs = append(attrs, Attribute{
+				Name:  fName,
+				Type:  NUMBER,
+				Value: strconv.FormatInt(reflect.ValueOf(field).Int(), 10),
+			})
+		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+			attrs = append(attrs, Attribute{
+				Name:  fName,
+				Type:  NUMBER,
+				Value: strconv.FormatUint(reflect.ValueOf(field).Uint(), 10),
+			})
+		case reflect.Float32:
+			attrs = append(attrs, Attribute{
+				Name:  fName,
+				Type:  NUMBER,
+				Value: strconv.FormatFloat(reflect.ValueOf(field).Float(), 'f', -1, 32),
+			})
+		case reflect.Float64:
+			attrs = append(attrs, Attribute{
+				Name:  fName,
+				Type:  NUMBER,
+				Value: strconv.FormatFloat(reflect.ValueOf(field).Float(), 'f', -1, 64),
+			})
 		case reflect.Slice:
 			switch reflect.SliceOf(field.Type).Kind() { // switch on this as well
 			case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Float32, reflect.Float64:
