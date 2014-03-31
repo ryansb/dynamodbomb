@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+
 	simplejson "github.com/bitly/go-simplejson"
 )
 
@@ -14,8 +15,8 @@ type Table struct {
 }
 
 type AttributeDefinitionT struct {
-	Name string `json:"AttributeName"`
-	Type string `json:"AttributeType"`
+	Name string   `json:"AttributeName"`
+	Type DataType `json:"AttributeType"`
 }
 
 type KeySchemaT struct {

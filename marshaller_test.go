@@ -1,9 +1,10 @@
 package ddbomb_test
 
 import (
+	"time"
+
 	"github.com/ryansb/dynamodbomb"
 	"launchpad.net/gocheck"
-	"time"
 )
 
 type TestSubStruct struct {
@@ -186,13 +187,13 @@ func (s *MarshallerSuite) TestMarshal(c *gocheck.C) {
 func (s *MarshallerSuite) TestUnmarshal(c *gocheck.C) {
 	testObj := &TestStruct{}
 
-	attrMap := map[string]*ddbomb.Attribute{}
+	attrMap := map[string]ddbomb.Attribute{}
 	attrs := testAttrs()
 	for i, _ := range attrs {
-		attrMap[attrs[i].Name] = &attrs[i]
+		attrMap[attrs[i].Name] = attrs[i]
 	}
 
-	err := ddbomb.UnmarshalAttributes(&attrMap, testObj)
+	err := ddbomb.UnmarshalAttributes(attrMap, testObj)
 	if err != nil {
 		c.Fatalf("Error from ddbomb.UnmarshalAttributes: %#v (Built: %#v)", err, testObj)
 	}
@@ -215,13 +216,13 @@ func (s *MarshallerSuite) TestMarshalTime(c *gocheck.C) {
 func (s *MarshallerSuite) TestUnmarshalTime(c *gocheck.C) {
 	testObj := &TestStructTime{}
 
-	attrMap := map[string]*ddbomb.Attribute{}
+	attrMap := map[string]ddbomb.Attribute{}
 	attrs := testAttrsTime()
 	for i, _ := range attrs {
-		attrMap[attrs[i].Name] = &attrs[i]
+		attrMap[attrs[i].Name] = attrs[i]
 	}
 
-	err := ddbomb.UnmarshalAttributes(&attrMap, testObj)
+	err := ddbomb.UnmarshalAttributes(attrMap, testObj)
 	if err != nil {
 		c.Fatalf("Error from ddbomb.UnmarshalAttributes: %#v (Built: %#v)", err, testObj)
 	}
@@ -266,13 +267,13 @@ func (s *MarshallerSuite) TestMarshalEmptySets(c *gocheck.C) {
 func (s *MarshallerSuite) TestUnmarshalEmptySets(c *gocheck.C) {
 	testObj := &TestStruct{}
 
-	attrMap := map[string]*ddbomb.Attribute{}
+	attrMap := map[string]ddbomb.Attribute{}
 	attrs := testAttrsWithNilSets()
 	for i, _ := range attrs {
-		attrMap[attrs[i].Name] = &attrs[i]
+		attrMap[attrs[i].Name] = attrs[i]
 	}
 
-	err := ddbomb.UnmarshalAttributes(&attrMap, testObj)
+	err := ddbomb.UnmarshalAttributes(attrMap, testObj)
 	if err != nil {
 		c.Fatalf("Error from ddbomb.UnmarshalAttributes: %#v (Built: %#v)", err, testObj)
 	}

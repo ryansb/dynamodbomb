@@ -33,7 +33,7 @@ func MarshalAttributes(m interface{}) ([]Attribute, error) {
 	return builder.buffer, nil
 }
 
-func UnmarshalAttributes(attributesRef *map[string]*Attribute, m interface{}) error {
+func UnmarshalAttributes(attributes map[string]Attribute, m interface{}) error {
 	rv := reflect.ValueOf(m)
 	if rv.Kind() != reflect.Ptr || rv.IsNil() {
 		return fmt.Errorf("InvalidUnmarshalError reflect.ValueOf(v): %#v, m interface{}: %#v", rv, reflect.TypeOf(m))
@@ -41,14 +41,13 @@ func UnmarshalAttributes(attributesRef *map[string]*Attribute, m interface{}) er
 
 	v := reflect.ValueOf(m).Elem()
 
-	attributes := *attributesRef
 	for _, f := range cachedTypeFields(v.Type()) { // loop on each field
 		fv := fieldByIndex(v, f.index)
-		correlatedAttribute := attributes[f.name]
-		if correlatedAttribute == nil {
+		correlatedAttribute, exists := attributes[f.name]
+		if !exists {
 			continue
 		}
-		err := unmarshallAttribute(correlatedAttribute, fv)
+		err := unmarshallAttribute(&correlatedAttribute, fv)
 		if err != nil {
 			return err
 		}

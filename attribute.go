@@ -1,7 +1,6 @@
 package ddbomb
 
 import (
-	"reflect"
 	"strconv"
 )
 
@@ -160,76 +159,4 @@ func newComparison(attributeName string, dataType DataType, comparisonOperator C
 		comparisonOperator,
 		attrs,
 	}
-}
-
-/* Takes any struct and prepares it to save to dynamodb. To make sure a field
- * never gets saved in dynamodb, use the struct tag "ddbignore"
- * type MyThing struct {
- *     unHashedPassword string `ddbignore:"please"` // will never be stored in dynamo
- *     HashedPassword   string `ddbname:"hashpw"`   // change the name of the attribute in dynamodb
- *     Thumbnail        []byte `ddbtype:"BINARY"`   // make sure it's saved as binary
- * }
- */
-func fromArbitrary(in interface{}) (attrs []Attribute) {
-	st := reflect.TypeOf(in)
-	for i := 0; i < st.NumField(); i++ {
-		field := st.Field(i)
-		if field.Tag.Get("ddbignore") != "" {
-			continue
-		}
-		fName := field.Tag.Get("ddbname")
-		fType := field.Tag.Get("ddbtype")
-		if fName == "" {
-			fName = field.Name // no name tag, use field name
-		}
-		if fType == "" {
-			// no type tag, guess using primitive
-		}
-		switch field.Type.Kind() {
-		case reflect.Bool:
-			_ = BINARY
-		case reflect.String:
-			attrs = append(attrs, Attribute{
-				Name:  fName,
-				Type:  STRING,
-				Value: reflect.ValueOf(field).String(),
-			})
-		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-			attrs = append(attrs, Attribute{
-				Name:  fName,
-				Type:  NUMBER,
-				Value: strconv.FormatInt(reflect.ValueOf(field).Int(), 10),
-			})
-		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-			attrs = append(attrs, Attribute{
-				Name:  fName,
-				Type:  NUMBER,
-				Value: strconv.FormatUint(reflect.ValueOf(field).Uint(), 10),
-			})
-		case reflect.Float32:
-			attrs = append(attrs, Attribute{
-				Name:  fName,
-				Type:  NUMBER,
-				Value: strconv.FormatFloat(reflect.ValueOf(field).Float(), 'f', -1, 32),
-			})
-		case reflect.Float64:
-			attrs = append(attrs, Attribute{
-				Name:  fName,
-				Type:  NUMBER,
-				Value: strconv.FormatFloat(reflect.ValueOf(field).Float(), 'f', -1, 64),
-			})
-		case reflect.Slice:
-			switch reflect.SliceOf(field.Type).Kind() { // switch on this as well
-			case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Float32, reflect.Float64:
-				_ = NUMBER_SET
-			case reflect.String:
-				_ = STRING_SET
-			default:
-				// skip field
-			}
-		default:
-			// skip field
-		}
-	}
-	return
 }
