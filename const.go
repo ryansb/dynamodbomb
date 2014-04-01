@@ -2,11 +2,16 @@ package ddbomb
 
 type DataType string
 type ComparisonType string
+type ProjectionType string
 type KeyType string
 
 const (
 	RANGE_KEY KeyType = "RANGE"
 	HASH_KEY          = "HASH"
+
+	PROJ_ALL       ProjectionType = "ALL"
+	PROJ_KEYS_ONLY                = "KEYS_ONLY"
+	PROJ_INCLUDE                  = "INCLUDE"
 
 	STRING DataType = "S"
 	NUMBER          = "N"

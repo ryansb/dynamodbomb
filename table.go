@@ -25,7 +25,8 @@ type KeySchemaT struct {
 }
 
 type ProjectionT struct {
-	ProjectionType string
+	ProjectionType   ProjectionType
+	NonKeyAttributes []string
 }
 
 type GlobalSecondaryIndexT struct {
