@@ -41,7 +41,7 @@ func (batchWriteItem *BatchWriteItem) AddTable(t *Table, itemActions *map[string
 	return batchWriteItem
 }
 
-func (batchGetItem *BatchGetItem) Execute() (map[string][]map[string]*Attribute, error) {
+func (batchGetItem *BatchGetItem) Execute() (map[string][]map[string]Attribute, error) {
 	q := NewEmptyQuery()
 	q.AddGetRequestItems(batchGetItem.Keys)
 
@@ -56,7 +56,7 @@ func (batchGetItem *BatchGetItem) Execute() (map[string][]map[string]*Attribute,
 		return nil, err
 	}
 
-	results := make(map[string][]map[string]*Attribute)
+	results := make(map[string][]map[string]Attribute)
 
 	tables, err := json.Get("Responses").Map()
 	if err != nil {
@@ -65,7 +65,7 @@ func (batchGetItem *BatchGetItem) Execute() (map[string][]map[string]*Attribute,
 	}
 
 	for table, entries := range tables {
-		var tableResult []map[string]*Attribute
+		var tableResult []map[string]Attribute
 
 		jsonEntriesArray, ok := entries.([]interface{})
 		if !ok {
@@ -120,15 +120,15 @@ func (batchWriteItem *BatchWriteItem) Execute() (map[string]interface{}, error) 
 
 }
 
-func (t *Table) GetItem(key *Key) (map[string]*Attribute, error) {
+func (t *Table) GetItem(key *Key) (map[string]Attribute, error) {
 	return t.getItem(key, false)
 }
 
-func (t *Table) GetItemConsistent(key *Key, consistentRead bool) (map[string]*Attribute, error) {
+func (t *Table) GetItemConsistent(key *Key, consistentRead bool) (map[string]Attribute, error) {
 	return t.getItem(key, consistentRead)
 }
 
-func (t *Table) getItem(key *Key, consistentRead bool) (map[string]*Attribute, error) {
+func (t *Table) getItem(key *Key, consistentRead bool) (map[string]Attribute, error) {
 	q := NewQuery(t)
 	q.AddKey(t, key)
 
@@ -280,25 +280,24 @@ func (t *Table) modifyAttributes(key *Key, attributes, expected []Attribute, act
 	return true, nil
 }
 
-func parseAttributes(s map[string]interface{}) map[string]*Attribute {
-	results := map[string]*Attribute{}
-
+func parseAttributes(s map[string]interface{}) map[string]Attribute {
+	results := make(map[string]Attribute)
 	for key, value := range s {
 		if v, ok := value.(map[string]interface{}); ok {
 			if val, ok := v[string(STRING)].(string); ok {
-				results[key] = &Attribute{
+				results[key] = Attribute{
 					Type:  STRING,
 					Name:  key,
 					Value: val,
 				}
 			} else if val, ok := v[string(NUMBER)].(string); ok {
-				results[key] = &Attribute{
+				results[key] = Attribute{
 					Type:  NUMBER,
 					Name:  key,
 					Value: val,
 				}
 			} else if val, ok := v[string(BINARY)].(string); ok {
-				results[key] = &Attribute{
+				results[key] = Attribute{
 					Type:  BINARY,
 					Name:  key,
 					Value: val,
@@ -310,7 +309,7 @@ func parseAttributes(s map[string]interface{}) map[string]*Attribute {
 						arry[i] = val
 					}
 				}
-				results[key] = &Attribute{
+				results[key] = Attribute{
 					Type:      STRING_SET,
 					Name:      key,
 					SetValues: arry,
@@ -322,7 +321,7 @@ func parseAttributes(s map[string]interface{}) map[string]*Attribute {
 						arry[i] = val
 					}
 				}
-				results[key] = &Attribute{
+				results[key] = Attribute{
 					Type:      NUMBER_SET,
 					Name:      key,
 					SetValues: arry,
@@ -334,7 +333,7 @@ func parseAttributes(s map[string]interface{}) map[string]*Attribute {
 						arry[i] = val
 					}
 				}
-				results[key] = &Attribute{
+				results[key] = Attribute{
 					Type:      BINARY_SET,
 					Name:      key,
 					SetValues: arry,

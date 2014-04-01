@@ -14,7 +14,15 @@ import (
 )
 
 func MarshalAttributes(m interface{}) ([]Attribute, error) {
-	v := reflect.ValueOf(m).Elem()
+	var v reflect.Value
+	switch reflect.ValueOf(m).Kind() {
+	case reflect.Interface, reflect.Ptr:
+		v = reflect.ValueOf(m).Elem()
+	case reflect.Struct:
+		v = reflect.ValueOf(m)
+	default:
+		v = reflect.ValueOf(m).Elem()
+	}
 
 	builder := &attributeBuilder{}
 	builder.buffer = []Attribute{}

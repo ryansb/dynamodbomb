@@ -6,27 +6,27 @@ import (
 	simplejson "github.com/bitly/go-simplejson"
 )
 
-func (t *Table) Query(attributeComparisons []AttributeComparison) ([]map[string]*Attribute, error) {
+func (t *Table) Query(attributeComparisons ...AttributeComparison) ([]map[string]Attribute, error) {
 	q := NewQuery(t)
 	q.AddKeyConditions(attributeComparisons)
 	return runQuery(q, t)
 }
 
-func (t *Table) QueryOnIndex(attributeComparisons []AttributeComparison, indexName string) ([]map[string]*Attribute, error) {
+func (t *Table) QueryOnIndex(indexName string, attributeComparisons ...AttributeComparison) ([]map[string]Attribute, error) {
 	q := NewQuery(t)
 	q.AddKeyConditions(attributeComparisons)
 	q.AddIndex(indexName)
 	return runQuery(q, t)
 }
 
-func (t *Table) LimitedQuery(attributeComparisons []AttributeComparison, limit int64) ([]map[string]*Attribute, error) {
+func (t *Table) LimitedQuery(attributeComparisons []AttributeComparison, limit int64) ([]map[string]Attribute, error) {
 	q := NewQuery(t)
 	q.AddKeyConditions(attributeComparisons)
 	q.AddLimit(limit)
 	return runQuery(q, t)
 }
 
-func (t *Table) LimitedQueryOnIndex(attributeComparisons []AttributeComparison, indexName string, limit int64) ([]map[string]*Attribute, error) {
+func (t *Table) LimitedQueryOnIndex(attributeComparisons []AttributeComparison, indexName string, limit int64) ([]map[string]Attribute, error) {
 	q := NewQuery(t)
 	q.AddKeyConditions(attributeComparisons)
 	q.AddIndex(indexName)
@@ -55,7 +55,7 @@ func (t *Table) CountQuery(attributeComparisons []AttributeComparison) (int64, e
 	return itemCount, nil
 }
 
-func runQuery(q *Query, t *Table) ([]map[string]*Attribute, error) {
+func runQuery(q *Query, t *Table) ([]map[string]Attribute, error) {
 	jsonResponse, err := t.Server.queryServer("DynamoDB_20120810.Query", q)
 	if err != nil {
 		return nil, err
@@ -72,7 +72,7 @@ func runQuery(q *Query, t *Table) ([]map[string]*Attribute, error) {
 		return nil, errors.New(message)
 	}
 
-	results := make([]map[string]*Attribute, itemCount)
+	results := make([]map[string]Attribute, itemCount)
 
 	for i, _ := range results {
 		item, err := json.Get("Items").GetIndex(i).Map()
