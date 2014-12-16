@@ -14,7 +14,7 @@ more details.
 
 Without the crowdmob and goamz teams this project wouldn't exist, so give due
 credit to the Canonical team and [crowdmob/goamz contributors][goamzcontrib],
-and due bug reports to [me][https://github.com/ryansb/dynamodbomb/issues]
+and due bug reports to [me](https://github.com/ryansb/dynamodbomb/issues)
 
 ## Running the Tests
 
